@@ -1,11 +1,11 @@
-import { Copy, FolderPlus, Heart, StickyNote } from 'lucide-react';
+import { Copy, FolderPlus, Heart, Share2, StickyNote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import { copyVerse, recordView, useFavoriteIds, useNoteVerseIds, useToggleFavorite, type Verse } from '../lib/data';
 import { cn } from '../lib/utils';
 
-export type VerseDialogs = { openNote: (v: Verse) => void; openCollection: (v: Verse) => void };
+export type VerseDialogs = { openNote: (v: Verse) => void; openCollection: (v: Verse) => void; openShare: (v: Verse) => void };
 
 /** Barra de ações de um versículo (favoritar, nota, coleção, copiar). */
 export function VerseActions({ verse, dialogs, className }: { verse: Verse; dialogs: VerseDialogs; className?: string }) {
@@ -33,8 +33,8 @@ export function VerseActions({ verse, dialogs, className }: { verse: Verse; dial
         <StickyNote className={cn('h-4 w-4', hasNote && 'text-gold')} />
       </button>
       <button className="icon-btn" onClick={needLogin(() => dialogs.openCollection(verse))} aria-label="Adicionar a uma coleção"><FolderPlus className="h-4 w-4" /></button>
+      <button className="icon-btn" onClick={() => dialogs.openShare(verse)} aria-label="Compartilhar como imagem"><Share2 className="h-4 w-4" /></button>
       <button className="icon-btn" onClick={() => copyVerse(verse, toast)} aria-label="Copiar versículo"><Copy className="h-4 w-4" /></button>
     </div>
   );
 }
-

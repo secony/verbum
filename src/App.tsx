@@ -10,6 +10,8 @@ const Explore = lazy(() => import('./pages/Explore'));
 const Library = lazy(() => import('./pages/Library'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Walk = lazy(() => import('./pages/Walk'));
+const PlansList = lazy(() => import('./pages/Plans').then((m) => ({ default: m.PlansList })));
+const PlanDetail = lazy(() => import('./pages/Plans').then((m) => ({ default: m.PlanDetail })));
 const Catholic = lazy(() => import('./pages/Catholic'));
 const About = lazy(() => import('./pages/About'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -34,6 +36,8 @@ export function App() {
             <Route path="favoritos" element={<Library />} />
             <Route path="perfil" element={<Profile />} />
             <Route path="caminhada" element={<Walk />} />
+            <Route path="planos" element={<PlansList />} />
+            <Route path="planos/:id" element={<PlanDetail />} />
             <Route path="catolica" element={<Catholic />} />
             <Route path="sobre" element={<About />} />
             <Route path="*" element={<NotFound />} />

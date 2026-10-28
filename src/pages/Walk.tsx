@@ -134,6 +134,11 @@ export default function Walk() {
         </Link>
       )}
 
+      <Link to="/planos" className="surface block p-5 hover:border-gold">
+        <span className="eyebrow block">Planos de leitura</span>
+        <span className="font-serif text-2xl">Evangelhos, Novo Testamento, Salmos e Provérbios</span>
+      </Link>
+
       <section aria-labelledby="atividades">
         <h2 id="atividades" className="mb-2 text-3xl">Minhas atividades</h2>
         <p className="mb-4 text-sm text-muted">Escolha o que faz parte da sua rotina.</p>
