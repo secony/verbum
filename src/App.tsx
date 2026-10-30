@@ -13,6 +13,11 @@ const Walk = lazy(() => import('./pages/Walk'));
 const PlansList = lazy(() => import('./pages/Plans').then((m) => ({ default: m.PlansList })));
 const PlanDetail = lazy(() => import('./pages/Plans').then((m) => ({ default: m.PlanDetail })));
 const Catholic = lazy(() => import('./pages/Catholic'));
+const EntendaList = lazy(() => import('./pages/Entenda').then((m) => ({ default: m.EntendaList })));
+const EntendaArticle = lazy(() => import('./pages/Entenda').then((m) => ({ default: m.EntendaArticle })));
+const ChurchesList = lazy(() => import('./pages/Churches').then((m) => ({ default: m.ChurchesList })));
+const ChurchDetail = lazy(() => import('./pages/Churches').then((m) => ({ default: m.ChurchDetail })));
+const Admin = lazy(() => import('./pages/Admin'));
 const About = lazy(() => import('./pages/About'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -39,6 +44,11 @@ export function App() {
             <Route path="planos" element={<PlansList />} />
             <Route path="planos/:id" element={<PlanDetail />} />
             <Route path="catolica" element={<Catholic />} />
+            <Route path="catolica/entenda" element={<EntendaList />} />
+            <Route path="catolica/entenda/:slug" element={<EntendaArticle />} />
+            <Route path="catolica/igrejas" element={<ChurchesList />} />
+            <Route path="catolica/igrejas/:id" element={<ChurchDetail />} />
+            <Route path="admin" element={<Admin />} />
             <Route path="sobre" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Route>
