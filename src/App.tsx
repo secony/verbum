@@ -18,6 +18,8 @@ const EntendaArticle = lazy(() => import('./pages/Entenda').then((m) => ({ defau
 const ChurchesList = lazy(() => import('./pages/Churches').then((m) => ({ default: m.ChurchesList })));
 const ChurchDetail = lazy(() => import('./pages/Churches').then((m) => ({ default: m.ChurchDetail })));
 const Admin = lazy(() => import('./pages/Admin'));
+const Rosary = lazy(() => import('./pages/Rosary'));
+const Prayers = lazy(() => import('./pages/Prayers'));
 const About = lazy(() => import('./pages/About'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -48,6 +50,8 @@ export function App() {
             <Route path="catolica/entenda/:slug" element={<EntendaArticle />} />
             <Route path="catolica/igrejas" element={<ChurchesList />} />
             <Route path="catolica/igrejas/:id" element={<ChurchDetail />} />
+            <Route path="catolica/terco" element={<Rosary />} />
+            <Route path="catolica/oracoes" element={<Prayers />} />
             <Route path="admin" element={<Admin />} />
             <Route path="sobre" element={<About />} />
             <Route path="*" element={<NotFound />} />

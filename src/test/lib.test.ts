@@ -186,3 +186,59 @@ describe('horários de missa', () => {
     expect(mapLinks({ latitude: null, longitude: null, address: null, neighborhood: null }).route).toBeUndefined();
   });
 });
+
+import { MYSTERY_SETS, STEPS, beadLayout, beadStates, progressLabel, suggestedSet } from '../lib/rosary';
+
+describe('terço', () => {
+  it('tem o número certo de passos e de orações', () => {
+    expect(STEPS).toHaveLength(74);
+    const count = (p: string) => STEPS.filter((s) => s.prayer === p).length;
+    expect(count('ave')).toBe(53);       // 3 iniciais + 5 × 10
+    expect(count('pai')).toBe(6);        // 1 inicial + 5 dezenas
+    expect(count('gloria')).toBe(6);     // 1 inicial + 5 dezenas
+    expect(count('fatima')).toBe(5);
+    expect(count('salve')).toBe(1);
+    expect(count('creio')).toBe(1);
+    expect(STEPS.filter((s) => s.announce)).toHaveLength(5);
+    for (let d = 1; d <= 5; d++) expect(STEPS.filter((s) => s.decade === d && s.prayer === 'ave')).toHaveLength(10);
+    expect(STEPS.map((s) => s.index)).toEqual(STEPS.map((_, i) => i));
+  });
+  it('desenha 6 contas grandes, 53 pequenas, medalha e cruz, e todo passo aponta para uma conta existente', () => {
+    const beads = beadLayout();
+    const by = (k: string) => beads.filter((b) => b.kind === k).length;
+    expect([by('large'), by('small'), by('medal'), by('cross')]).toEqual([6, 53, 1, 1]);
+    expect(new Set(beads.map((b) => b.id)).size).toBe(beads.length);
+    const ids = new Set(beads.map((b) => b.id));
+    expect(STEPS.every((s) => ids.has(s.bead))).toBe(true);
+  });
+  it('as contas "evoluem": estados derivados do passo atual', () => {
+    const at = (n: number) => beadStates(STEPS, n);
+    expect(at(0).cross).toBe('current');
+    expect(at(1).cross).toBe('current');       // Sinal da Cruz e Creio ficam na mesma conta
+    expect(at(2).cross).toBe('done');
+    expect(at(2)['p-pn']).toBe('current');
+    expect(at(7)['d1-pn']).toBe('current');
+    expect(at(8)['d1-pn']).toBe('done');
+    const reached = (n: number) => Object.values(at(n)).filter((s) => s !== 'upcoming').length;
+    let prev = -1;
+    for (let i = 0; i <= STEPS.length; i++) { const d = reached(i); expect(d).toBeGreaterThanOrEqual(prev); prev = d; }
+    expect(at(72).medal).toBe('current');       // Salve-Rainha na medalha
+    expect(at(73).cross).toBe('current');       // Sinal da Cruz final volta à cruz
+    expect(at(72).cross).toBe('done');
+    expect(Object.values(at(STEPS.length)).every((s) => s === 'done')).toBe(true);
+    expect(Object.values(at(0)).filter((s) => s === 'current')).toHaveLength(1);
+  });
+  it('rótulos do centro', () => {
+    expect(progressLabel(STEPS[5], false)).toEqual({ line1: 'Início', line2: 'Ave-Maria 3 de 3' });
+    expect(progressLabel(STEPS[7], false)).toEqual({ line1: 'Dezena 1 de 5', line2: 'Pai-Nosso' });
+    expect(progressLabel(STEPS[10], false)).toEqual({ line1: 'Dezena 1 de 5', line2: 'Ave-Maria 3 de 10' });
+    expect(progressLabel(undefined, true).line1).toBe('Terço concluído');
+  });
+  it('sugestão por dia da semana e mistérios completos', () => {
+    const d = (n: number) => suggestedSet(new Date(2026, 9, 25 + n)); // 25/10/2026 é domingo
+    expect([d(0), d(1), d(2), d(3), d(4), d(5), d(6)]).toEqual(['gloriosos', 'gozosos', 'dolorosos', 'gloriosos', 'luminosos', 'dolorosos', 'gozosos']);
+    expect(MYSTERY_SETS).toHaveLength(4);
+    for (const s of MYSTERY_SETS) { expect(s.mysteries).toHaveLength(5); for (const m of s.mysteries) expect(m.ref || m.tradition).toBeTruthy(); }
+    expect(MYSTERY_SETS.flatMap((s) => s.mysteries).filter((m) => m.tradition)).toHaveLength(2);
+  });
+});

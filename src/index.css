@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 247 245 239; --surface: 255 255 255; --soft: 241 238 228; --line: 230 225 214;
+  --fg: 40 40 32; --muted: 119 117 104; --gold: 167 128 54; --olive: 98 109 76;
+  --on-olive: 255 255 255; --danger: 160 60 50;
+  --verse-size: 1.375rem;
+}
+.dark {
+  --bg: 17 17 13; --surface: 27 27 20; --soft: 34 34 26; --line: 52 52 42;
+  --fg: 233 229 219; --muted: 166 163 151; --gold: 201 164 92; --olive: 146 155 112;
+  --on-olive: 17 17 13; --danger: 214 120 108;
+}
+html[data-font='sm'] { --verse-size: 1.15rem; }
+html[data-font='md'] { --verse-size: 1.375rem; }
+html[data-font='lg'] { --verse-size: 1.625rem; }
+html[data-font='xl'] { --verse-size: 1.9rem; }
+
+@layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  body { @apply bg-bg text-fg font-sans antialiased; }
+  h1, h2, h3 { @apply font-serif font-medium tracking-tight; }
+  :focus-visible { outline: 2px solid rgb(var(--olive)); outline-offset: 2px; }
+  ::selection { background: rgb(var(--gold) / 0.3); }
+}
+
+@layer components {
+  .surface { @apply bg-surface border border-line rounded-2xl shadow-soft; }
+  .eyebrow { @apply text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-gold; }
+  .verse-text { @apply font-serif; font-size: var(--verse-size); line-height: 1.55; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none; }
+  .btn-primary { @apply btn bg-olive text-on-olive hover:opacity-90; }
+  .btn-outline { @apply btn border border-line bg-surface hover:bg-soft; }
+  .btn-ghost { @apply btn hover:bg-soft; }
+  .btn-danger { @apply btn border border-danger/40 text-danger hover:bg-danger/10; }
+  .icon-btn { @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft hover:text-fg; }
+  .input { @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm placeholder:text-muted/70; }
+  .chip { @apply inline-flex items-center rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm transition-colors hover:border-gold; }
+  .chip-on { @apply border-olive bg-olive text-on-olive hover:border-olive; }
+}
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fade-up 0.4s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } * { scroll-behavior: auto !important; } }
+
+@keyframes bead-ring { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 0.25; transform: scale(1.35); } }
+.bead-ring { transform-box: fill-box; transform-origin: center; animation: bead-ring 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .bead-ring { animation: none; } }

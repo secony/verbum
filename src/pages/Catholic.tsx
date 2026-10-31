@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CalendarHeart, Church, Newspaper, ScrollText, ShieldCheck, Sparkles } from 'lucide-react';
+import { CalendarHeart, Church, CircleDot, HandHeart, Newspaper, ScrollText, ShieldCheck, Sparkles } from 'lucide-react';
 import { PageHeader } from '../components/ui';
 import { useChurches, useIsAdmin, usePublishedArticles } from '../lib/catholic-data';
 import { coverage } from '../lib/catholic';
@@ -12,6 +12,8 @@ export default function Catholic() {
   const cov = churches.data ? coverage(churches.data) : null;
 
   const cards = [
+    { icon: CircleDot, title: 'O Santo Terço', to: '/catolica/terco', text: 'Reze passo a passo, com o terço desenhado: as contas se preenchem conforme você avança nas orações e nos mistérios.', status: 'Mistérios gozosos, luminosos, dolorosos e gloriosos, com a sugestão do dia.' },
+    { icon: HandHeart, title: 'Orações', to: '/catolica/oracoes', text: 'Sinal da Cruz, Pai-Nosso, Ave-Maria, Glória, Creio, Salve-Rainha e Oração de Fátima.', status: 'Versões tradicionais em português do Brasil.' },
     {
       icon: Sparkles, title: 'Entenda a Igreja', to: '/catolica/entenda',
       text: 'Estrutura da Igreja, sacramentos, liturgia e tradições, em textos curtos com as fontes.',
