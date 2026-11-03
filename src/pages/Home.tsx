@@ -64,13 +64,11 @@ export default function Home() {
   const lastBook = last.data ? books.data?.find((book) => book.id === last.data?.bookId) : undefined;
   return (
     <div className="space-y-12">
-      <header className="surface fade-up relative overflow-hidden bg-gradient-to-br from-surface via-surface to-soft/70 p-7 sm:p-10">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full border border-gold/20" aria-hidden />
-        <div className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full border border-gold/20" aria-hidden />
-        <div className="relative max-w-xl">
+      <header className="fade-up border-l-2 border-olive bg-soft/65 px-5 py-6 sm:px-8 sm:py-8">
+        <div className="max-w-xl">
           <p className="eyebrow mb-3">{fmtDate(now)}</p>
-          <h1 className="text-5xl md:text-6xl">{greeting(now)}.</h1>
-          <p className="mt-3 text-lg text-muted">Reserve um momento de silêncio para estar com a Palavra.</p>
+          <h1 className="text-4xl leading-tight sm:text-5xl">{greeting(now)}.</h1>
+          <p className="mt-3 text-base leading-7 text-muted">Reserve um momento de silêncio para estar com a Palavra.</p>
           <div className="mt-6 flex flex-wrap gap-3">
             {lastBook && last.data ? (
               <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="btn-primary"><BookOpen className="h-4 w-4" aria-hidden /> Continuar {lastBook.name} {last.data.chapter}</Link>
@@ -87,7 +85,7 @@ export default function Home() {
       </section>
 
       <section aria-labelledby="temas">
-        <h2 id="temas" className="mb-4 text-3xl">Temas</h2>
+        <h2 id="temas" className="mb-4 text-2xl sm:text-3xl">Temas</h2>
         <div className="flex flex-wrap gap-2">
           {themes.data?.map((t) => <Link key={t.id} to={`/explorar?tema=${t.slug}`} className="chip">{t.name}</Link>)}
         </div>

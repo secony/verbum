@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 import { bookSlug } from '../lib/bible-nav';
 import { useBooks, useLastPosition, type Book } from '../lib/data';
@@ -29,26 +30,32 @@ export default function BibleIndex() {
   const books = useBooks();
   const last = useLastPosition();
   const [open, setOpen] = useState<number | null>(null);
+  const [query, setQuery] = useState('');
   if (books.isLoading) return <Spinner />;
   if (books.isError || !books.data) return <ErrorBox onRetry={() => books.refetch()} />;
 
   const lastBook = last.data ? books.data.find((b) => b.id === last.data!.bookId) : undefined;
   const groups = [
-    { id: 'AT', title: 'Antigo Testamento', items: books.data.filter((b) => b.testament === 'AT') },
-    { id: 'NT', title: 'Novo Testamento', items: books.data.filter((b) => b.testament === 'NT') },
+    { id: 'AT', title: 'Antigo Testamento', items: books.data.filter((b) => b.testament === 'AT' && b.name.toLocaleLowerCase('pt-BR').includes(query.trim().toLocaleLowerCase('pt-BR'))) },
+    { id: 'NT', title: 'Novo Testamento', items: books.data.filter((b) => b.testament === 'NT' && b.name.toLocaleLowerCase('pt-BR').includes(query.trim().toLocaleLowerCase('pt-BR'))) },
   ];
   return (
     <div>
       <PageHeader eyebrow="Cânon católico · 73 livros" title="Bíblia">Escolha um livro e um capítulo para ler.</PageHeader>
       <TestNotice className="mb-6" />
+      <label className="relative mb-6 block max-w-xl">
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+        <span className="sr-only">Buscar livro bíblico</span>
+        <input type="search" className="input pl-10" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar livro da Bíblia" />
+      </label>
       {lastBook && last.data && (
         <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="surface mb-8 flex items-center justify-between p-5 hover:border-gold">
           <span><span className="eyebrow block">Continuar leitura</span><span className="font-serif text-2xl">{lastBook.name} {last.data.chapter}</span></span>
           <ChevronRight className="h-5 w-5 text-gold" aria-hidden />
         </Link>
       )}
-      <div className="grid gap-8 lg:grid-cols-2">
-        {groups.map((g) => (
+      {groups.every((group) => !group.items.length) ? <p className="py-8 text-sm text-muted">Nenhum livro encontrado para essa busca.</p> : <div className="grid gap-8 lg:grid-cols-2">
+        {groups.filter((g) => g.items.length > 0).map((g) => (
           <section key={g.id} aria-labelledby={`g-${g.id}`}>
             <h2 id={`g-${g.id}`} className="mb-3 text-3xl">{g.title}</h2>
             <ul className="surface overflow-hidden">
@@ -56,7 +63,7 @@ export default function BibleIndex() {
             </ul>
           </section>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }

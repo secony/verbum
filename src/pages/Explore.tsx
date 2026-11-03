@@ -77,17 +77,23 @@ export default function Explore() {
     <div>
       <PageHeader eyebrow="Biblioteca" title="Explorar">Busque por palavra, por referência (ex.: “Jo 3,16”) ou navegue por tema, testamento e livro.</PageHeader>
 
-      <form role="search" onSubmit={(e) => { e.preventDefault(); set('q', input.trim()); }} className="mb-4 flex gap-2">
+      <form role="search" onSubmit={(e) => { e.preventDefault(); set('q', input.trim()); }} className="mb-4 flex flex-col gap-2 sm:flex-row">
         <label htmlFor="busca" className="sr-only">Buscar versículos</label>
         <input id="busca" type="search" className="input" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Palavra ou referência — “love”, “Sl 22”, “John 3:16”" />
-        <button className="btn-primary" type="submit"><Search className="h-4 w-4" aria-hidden /> Buscar</button>
+        <button className="btn-primary sm:shrink-0" type="submit"><Search className="h-4 w-4" aria-hidden /> Buscar</button>
       </form>
 
-      <div className="mb-3 flex flex-wrap gap-2" aria-label="Filtros">
-        <select aria-label="Testamento" className="input !w-auto" value={testament} onChange={(e) => set('t', e.target.value)}>
+      <div className="mb-3 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap" aria-label="Filtros">
+        <select aria-label="Testamento" className="input sm:!w-auto" value={testament} onChange={(e) => {
+          const next = e.target.value;
+          const p = new URLSearchParams(params);
+          if (next) p.set('t', next); else p.delete('t');
+          if (bookId && books.data?.find((b) => String(b.id) === bookId)?.testament !== next) p.delete('livro');
+          setParams(p, { replace: true });
+        }}>
           <option value="">Todos os testamentos</option><option value="AT">Antigo Testamento</option><option value="NT">Novo Testamento</option>
         </select>
-        <select aria-label="Livro" className="input !w-auto max-w-[14rem]" value={bookId} onChange={(e) => set('livro', e.target.value)}>
+        <select aria-label="Livro" className="input sm:!w-auto sm:max-w-[14rem]" value={bookId} onChange={(e) => set('livro', e.target.value)}>
           <option value="">Todos os livros</option>
           {books.data?.filter((b) => !testament || b.testament === testament).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
         </select>

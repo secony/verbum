@@ -3,15 +3,35 @@
 @tailwind utilities;
 
 :root {
-  --bg: 247 245 239; --surface: 255 255 255; --soft: 241 238 228; --line: 230 225 214;
-  --fg: 40 40 32; --muted: 119 117 104; --gold: 167 128 54; --olive: 98 109 76;
-  --on-olive: 255 255 255; --danger: 160 60 50;
+  color-scheme: light;
+  --bg: 247 245 239;
+  --surface: 255 255 255;
+  --soft: 241 238 228;
+  --line: 226 222 211;
+  --fg: 40 40 32;
+  --muted: 105 104 94;
+  --gold: 155 116 48;
+  --olive: 82 96 61;
+  --on-olive: 255 255 255;
+  --danger: 160 60 50;
   --verse-size: 1.375rem;
+  --radius-control: 0.7rem;
+  --radius-surface: 1rem;
+  --shadow-surface: 0 1px 2px rgb(34 31 22 / 0.035), 0 12px 30px -22px rgb(34 31 22 / 0.2);
 }
 .dark {
-  --bg: 17 17 13; --surface: 27 27 20; --soft: 34 34 26; --line: 52 52 42;
-  --fg: 233 229 219; --muted: 166 163 151; --gold: 201 164 92; --olive: 146 155 112;
-  --on-olive: 17 17 13; --danger: 214 120 108;
+  color-scheme: dark;
+  --bg: 18 19 16;
+  --surface: 27 29 24;
+  --soft: 37 39 32;
+  --line: 57 59 49;
+  --fg: 235 232 222;
+  --muted: 174 172 159;
+  --gold: 207 171 99;
+  --olive: 154 166 120;
+  --on-olive: 20 22 17;
+  --danger: 214 120 108;
+  --shadow-surface: 0 1px 2px rgb(0 0 0 / 0.18), 0 14px 34px -24px rgb(0 0 0 / 0.58);
 }
 html[data-font='sm'] { --verse-size: 1.15rem; }
 html[data-font='md'] { --verse-size: 1.375rem; }
@@ -19,33 +39,43 @@ html[data-font='lg'] { --verse-size: 1.625rem; }
 html[data-font='xl'] { --verse-size: 1.9rem; }
 
 @layer base {
-  html { color-scheme: light; }
-  html.dark { color-scheme: dark; }
-  body { @apply bg-bg text-fg font-sans antialiased; }
+  html { scroll-behavior: smooth; }
+  body { @apply bg-bg text-fg font-sans antialiased; min-width: 320px; }
   h1, h2, h3 { @apply font-serif font-medium tracking-tight; }
-  :focus-visible { outline: 2px solid rgb(var(--olive)); outline-offset: 2px; }
-  ::selection { background: rgb(var(--gold) / 0.3); }
+  button, input, select, textarea { font: inherit; }
+  button:not(:disabled), a, select { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid rgb(var(--olive)); outline-offset: 3px; }
+  ::selection { background: rgb(var(--gold) / 0.28); }
 }
 
 @layer components {
-  .surface { @apply bg-surface border border-line rounded-2xl shadow-soft; }
-  .eyebrow { @apply text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-gold; }
-  .verse-text { @apply font-serif; font-size: var(--verse-size); line-height: 1.55; }
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none; }
-  .btn-primary { @apply btn bg-olive text-on-olive hover:opacity-90; }
-  .btn-outline { @apply btn border border-line bg-surface hover:bg-soft; }
-  .btn-ghost { @apply btn hover:bg-soft; }
-  .btn-danger { @apply btn border border-danger/40 text-danger hover:bg-danger/10; }
-  .icon-btn { @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft hover:text-fg; }
-  .input { @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm placeholder:text-muted/70; }
-  .chip { @apply inline-flex items-center rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm transition-colors hover:border-gold; }
-  .chip-on { @apply border-olive bg-olive text-on-olive hover:border-olive; }
+  .surface { @apply border border-line bg-surface; border-radius: var(--radius-surface); box-shadow: var(--shadow-surface); }
+  .eyebrow { @apply text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-gold; }
+  .verse-text { @apply font-serif; font-size: var(--verse-size); line-height: 1.65; }
+  .btn { @apply inline-flex min-h-10 items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50; border-radius: var(--radius-control); }
+  .btn-primary { @apply btn bg-olive text-on-olive hover:brightness-95 active:brightness-90; }
+  .btn-outline { @apply btn border border-line bg-surface hover:border-olive/50 hover:bg-soft active:bg-soft; }
+  .btn-ghost { @apply btn hover:bg-soft active:bg-soft; }
+  .btn-danger { @apply btn border border-danger/35 text-danger hover:bg-danger/10; }
+  .icon-btn { @apply inline-flex h-10 w-10 shrink-0 items-center justify-center text-muted transition-colors duration-150 hover:bg-soft hover:text-fg disabled:pointer-events-none disabled:opacity-40; border-radius: var(--radius-control); }
+  .input { @apply min-h-11 w-full border border-line bg-surface px-3.5 py-2.5 text-base text-fg placeholder:text-muted/75 transition-colors; border-radius: var(--radius-control); }
+  .input:hover { @apply border-muted/50; }
+  .input:focus { @apply border-olive outline-none ring-2 ring-olive/15; }
+  .chip { @apply inline-flex min-h-10 items-center border border-line bg-surface px-3.5 py-1.5 text-sm transition-colors hover:border-gold/70 hover:bg-soft; border-radius: 999px; }
+  .chip-on { @apply border-olive bg-olive text-on-olive hover:border-olive hover:bg-olive; }
 }
 
-@keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.fade-up { animation: fade-up 0.4s ease-out both; }
-@media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } * { scroll-behavior: auto !important; } }
-
-@keyframes bead-ring { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 0.25; transform: scale(1.35); } }
+dialog::backdrop { background: rgb(17 18 14 / 0.55); backdrop-filter: blur(2px); }
+dialog[open] { animation: dialog-in 160ms ease-out both; }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: none; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fade-up 260ms ease-out both; }
+@keyframes bead-ring { 0%, 100% { opacity: .9; transform: scale(1); } 50% { opacity: .25; transform: scale(1.35); } }
 .bead-ring { transform-box: fill-box; transform-origin: center; animation: bead-ring 1.6s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .bead-ring { animation: none; } }
+@media (max-width: 767px) {
+  .verse-actions { opacity: 1 !important; }
+  dialog[open] { margin: auto 0 0; width: 100%; max-width: none; max-height: min(88dvh, 48rem); overflow-y: auto; border-radius: 1rem 1rem 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
