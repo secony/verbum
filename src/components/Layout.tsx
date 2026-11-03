@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { BookOpen, Compass, Heart, Home, Landmark, Moon, Sun, User } from 'lucide-react';
+import { BookOpen, Compass, Footprints, Heart, Home, Landmark, Moon, Sun, User } from 'lucide-react';
 import { usePrefs } from '../lib/prefs';
 import { cn } from '../lib/utils';
 
@@ -26,7 +26,7 @@ export function Layout() {
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface/60 p-5 md:flex">
-        <Link to="/" className="mb-8 px-2 font-serif text-3xl tracking-tight">Verbum</Link>
+        <Link to="/" className="mb-8 px-2 font-serif text-3xl tracking-tight">Verbum<span className="text-gold">.</span><span className="mt-1 block font-sans text-xs font-normal tracking-normal text-muted">Bíblia e vida católica</span></Link>
         <nav aria-label="Principal" className="flex flex-1 flex-col gap-1">
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink key={to} to={to} end={end}
@@ -34,6 +34,12 @@ export function Layout() {
               <Icon className="h-[18px] w-[18px]" aria-hidden /> {label}
             </NavLink>
           ))}
+          <div className="mt-4 border-t border-line pt-4">
+            <p className="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted">Sua rotina</p>
+            <NavLink to="/caminhada" className={({ isActive }) => cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors', isActive ? 'bg-soft font-medium text-olive' : 'text-muted hover:bg-soft hover:text-fg')}>
+              <Footprints className="h-[18px] w-[18px]" aria-hidden /> Minha caminhada
+            </NavLink>
+          </div>
         </nav>
         <div className="flex items-center justify-between px-1">
           <Link to="/sobre" className="text-xs text-muted hover:text-fg">Sobre o texto</Link>
@@ -43,10 +49,11 @@ export function Layout() {
 
       <div className="min-w-0">
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg/90 px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] backdrop-blur md:hidden">
-          <Link to="/" className="font-serif text-2xl">Verbum</Link>
+          <Link to="/" className="font-serif text-2xl">Verbum<span className="text-gold">.</span></Link>
           <ThemeButton />
         </header>
-        <main className="mx-auto w-full max-w-4xl px-4 pb-32 pt-6 md:px-10 md:pb-16 md:pt-12">
+        <a href="#conteudo" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2">Pular para o conteúdo</a>
+        <main id="conteudo" className="mx-auto w-full max-w-4xl px-4 pb-32 pt-6 md:px-10 md:pb-16 md:pt-12">
           <Outlet />
         </main>
       </div>

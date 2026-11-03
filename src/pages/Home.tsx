@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookX, CalendarHeart, Clock, Compass, Footprints, Heart, Newspaper } from 'lucide-react';
+import { BookOpen, BookX, Clock, Compass, Footprints, Heart, Landmark, ScrollText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { dailyIndex, greeting } from '../lib/daily';
 import { fmtDate } from '../lib/utils';
-import { VERSE_SELECT, useThemes, useVerseCount, type Verse } from '../lib/data';
+import { VERSE_SELECT, useBooks, useLastPosition, useThemes, useVerseCount, type Verse } from '../lib/data';
+import { bookSlug } from '../lib/bible-nav';
 import { VerseCard } from '../components/VerseCard';
 import { useVerseDialogs } from '../components/VerseDialogs';
 import { TestNotice } from '../components/TestNotice';
@@ -58,12 +59,25 @@ function WordOfTheDay() {
 export default function Home() {
   const now = new Date();
   const themes = useThemes();
+  const books = useBooks();
+  const last = useLastPosition();
+  const lastBook = last.data ? books.data?.find((book) => book.id === last.data?.bookId) : undefined;
   return (
     <div className="space-y-12">
-      <header className="fade-up">
-        <p className="eyebrow mb-2">{fmtDate(now)}</p>
-        <h1 className="text-5xl md:text-6xl">{greeting(now)}.</h1>
-        <p className="mt-3 text-lg text-muted">Um momento de silêncio com a Palavra.</p>
+      <header className="surface fade-up relative overflow-hidden bg-gradient-to-br from-surface via-surface to-soft/70 p-7 sm:p-10">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full border border-gold/20" aria-hidden />
+        <div className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full border border-gold/20" aria-hidden />
+        <div className="relative max-w-xl">
+          <p className="eyebrow mb-3">{fmtDate(now)}</p>
+          <h1 className="text-5xl md:text-6xl">{greeting(now)}.</h1>
+          <p className="mt-3 text-lg text-muted">Reserve um momento de silêncio para estar com a Palavra.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {lastBook && last.data ? (
+              <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="btn-primary"><BookOpen className="h-4 w-4" aria-hidden /> Continuar {lastBook.name} {last.data.chapter}</Link>
+            ) : <Link to="/biblia" className="btn-primary"><BookOpen className="h-4 w-4" aria-hidden /> Começar a leitura</Link>}
+            <Link to="/caminhada" className="btn-outline"><Footprints className="h-4 w-4" aria-hidden /> Minha caminhada</Link>
+          </div>
+        </div>
       </header>
 
       <section aria-labelledby="pd">
@@ -83,27 +97,13 @@ export default function Home() {
         {[
           { to: '/favoritos', icon: Heart, label: 'Meus favoritos' },
           { to: '/favoritos?aba=recentes', icon: Clock, label: 'Vistos recentemente' },
-          { to: '/caminhada', icon: Footprints, label: 'Minha caminhada' },
           { to: '/explorar', icon: Compass, label: 'Explorar versículos' },
+          { to: '/catolica/terco', icon: Landmark, label: 'Rezar o terço' },
+          { to: '/catolica/oracoes', icon: ScrollText, label: 'Orações' },
         ].map(({ to, icon: Icon, label }) => (
-          <Link key={to} to={to} className="surface flex items-center gap-3 p-5 transition-colors hover:border-gold">
-            <Icon className="h-5 w-5 text-gold" aria-hidden /> {label}
+          <Link key={to} to={to} className="surface group flex items-center gap-3 p-5 transition-colors hover:border-gold">
+            <Icon className="h-5 w-5 text-gold" aria-hidden /> <span className="flex-1">{label}</span><span className="text-muted transition-transform group-hover:translate-x-1" aria-hidden>→</span>
           </Link>
-        ))}
-      </section>
-
-      <section aria-labelledby="comp" className="grid gap-3 sm:grid-cols-3">
-        <h2 id="comp" className="sr-only">Conteúdo complementar</h2>
-        {[
-          { icon: CalendarHeart, t: 'Santo do dia', d: 'Em breve, com fonte verificável.' },
-          { icon: Newspaper, t: 'Liturgia diária', d: 'Em breve, a partir de fonte oficial ou autorizada.' },
-          { icon: Newspaper, t: 'Notícias católicas', d: 'Em breve, com fonte e data reais.' },
-        ].map(({ icon: Icon, t, d }) => (
-          <div key={t} className="surface p-5">
-            <Icon className="mb-3 h-5 w-5 text-gold" aria-hidden />
-            <h3 className="text-xl">{t}</h3>
-            <p className="mt-1 text-sm text-muted">{d}</p>
-          </div>
         ))}
       </section>
     </div>

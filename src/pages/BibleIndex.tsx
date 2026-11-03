@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { bookSlug } from '../lib/bible-nav';
 import { useBooks, useLastPosition, type Book } from '../lib/data';
@@ -16,7 +17,7 @@ function BookRow({ book, open, onToggle }: { book: Book; open: boolean; onToggle
       {open && (
         <div className="grid grid-cols-6 gap-1.5 px-4 pb-4 sm:grid-cols-8 md:grid-cols-10">
           {Array.from({ length: book.chapters_count }, (_, i) => i + 1).map((c) => (
-            <a key={c} href={`/biblia/${bookSlug(book)}/${c}`} className="rounded-lg border border-line py-1.5 text-center text-sm hover:border-olive hover:bg-soft">{c}</a>
+            <Link key={c} to={`/biblia/${bookSlug(book)}/${c}`} className="rounded-lg border border-line py-1.5 text-center text-sm hover:border-olive hover:bg-soft">{c}</Link>
           ))}
         </div>
       )}
@@ -41,10 +42,10 @@ export default function BibleIndex() {
       <PageHeader eyebrow="Cânon católico · 73 livros" title="Bíblia">Escolha um livro e um capítulo para ler.</PageHeader>
       <TestNotice className="mb-6" />
       {lastBook && last.data && (
-        <a href={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="surface mb-8 flex items-center justify-between p-5 hover:border-gold">
+        <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="surface mb-8 flex items-center justify-between p-5 hover:border-gold">
           <span><span className="eyebrow block">Continuar leitura</span><span className="font-serif text-2xl">{lastBook.name} {last.data.chapter}</span></span>
           <ChevronRight className="h-5 w-5 text-gold" aria-hidden />
-        </a>
+        </Link>
       )}
       <div className="grid gap-8 lg:grid-cols-2">
         {groups.map((g) => (

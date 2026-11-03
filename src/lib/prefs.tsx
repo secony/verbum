@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { supabase } from './supabase';
 import { useAuth } from './auth';
 import { isValidMode, type ReadingMode } from './reading-mode';
@@ -25,6 +25,7 @@ function applyTheme(t: Theme) {
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const localEdits = useRef(0);
   const [theme, setThemeState] = useState<Theme>(() => (['light', 'dark', 'system'].includes(read('verbum:theme') ?? '') ? (read('verbum:theme') as Theme) : 'system'));
   const [font, setFontState] = useState<FontSize>(() => (FONTS.includes(read('verbum:font') as FontSize) ? (read('verbum:font') as FontSize) : 'md'));
   const [mode, setModeState] = useState<ReadingMode | null>(() => { const m = read('verbum:mode'); return isValidMode(m) ? m : null; });
@@ -42,12 +43,15 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   // Ao entrar, traz as preferências salvas na conta.
   useEffect(() => {
     if (!user) return;
+    let active = true;
+    const editVersion = localEdits.current;
     supabase.from('profiles').select('theme,font_size,reading_mode').eq('user_id', user.id).maybeSingle().then(({ data }) => {
-      if (!data) return;
+      if (!active || !data || localEdits.current !== editVersion) return;
       if (['light', 'dark', 'system'].includes(data.theme)) { setThemeState(data.theme); write('verbum:theme', data.theme); }
       if (FONTS.includes(data.font_size)) { setFontState(data.font_size); write('verbum:font', data.font_size); }
       if (isValidMode(data.reading_mode)) { setModeState(data.reading_mode); write('verbum:mode', data.reading_mode); }
     });
+    return () => { active = false; };
   }, [user]);
 
   const save = useCallback((patch: Record<string, string | null>) => {
@@ -57,9 +61,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
   const value: PrefsCtx = {
     theme, font, mode,
-    setTheme: (t) => { setThemeState(t); write('verbum:theme', t); save({ theme: t }); },
-    setFont: (f) => { setFontState(f); write('verbum:font', f); save({ font_size: f }); },
-    setMode: (m) => { setModeState(m); if (m) write('verbum:mode', m); else { try { localStorage.removeItem('verbum:mode'); } catch { /* ignore */ } } save({ reading_mode: m }); },
+    setTheme: (t) => { localEdits.current++; setThemeState(t); write('verbum:theme', t); save({ theme: t }); },
+    setFont: (f) => { localEdits.current++; setFontState(f); write('verbum:font', f); save({ font_size: f }); },
+    setMode: (m) => { localEdits.current++; setModeState(m); if (m) write('verbum:mode', m); else { try { localStorage.removeItem('verbum:mode'); } catch { /* ignore */ } } save({ reading_mode: m }); },
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

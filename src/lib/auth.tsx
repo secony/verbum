@@ -27,9 +27,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setLoading(false); });
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => data.subscription.unsubscribe();
+    let active = true;
+    let receivedAuthEvent = false;
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
+      receivedAuthEvent = true;
+      setSession(s);
+      setLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: sessionData }) => {
+      if (!active || receivedAuthEvent) return;
+      setSession(sessionData.session);
+      setLoading(false);
+    }).catch(() => {
+      if (active && !receivedAuthEvent) setLoading(false);
+    });
+    return () => { active = false; data.subscription.unsubscribe(); };
   }, []);
 
   const value = useMemo<AuthCtx>(() => ({
