@@ -6,7 +6,7 @@ import { VerseActions, type VerseDialogs } from './VerseActions';
 export function VerseCard({ verse, dialogs, large }: { verse: Verse; dialogs: VerseDialogs; large?: boolean }) {
   const b = verse.books;
   return (
-    <article className={large ? 'surface fade-up p-5 sm:p-7 md:p-9' : 'surface fade-up p-4 sm:p-5'}>
+    <article className={large ? 'fade-up border-y border-gold/35 bg-soft/35 px-5 py-7 sm:px-8 sm:py-9' : 'surface fade-up p-4 sm:p-5'}>
       <p className={large ? 'verse-text max-w-[58ch] md:!text-[1.8rem]' : 'verse-text'}>“{verse.text}”</p>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
         <div>

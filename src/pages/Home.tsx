@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, BookX, Clock, Compass, Footprints, Heart, Landmark, ScrollText } from 'lucide-react';
+import { ArrowRight, BookOpen, BookX, Clock, Compass, Footprints, Heart, Landmark, ScrollText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { dailyIndex, greeting } from '../lib/daily';
 import { fmtDate } from '../lib/utils';
@@ -63,35 +63,49 @@ export default function Home() {
   const last = useLastPosition();
   const lastBook = last.data ? books.data?.find((book) => book.id === last.data?.bookId) : undefined;
   return (
-    <div className="space-y-12">
-      <header className="fade-up border-l-2 border-olive bg-soft/65 px-5 py-6 sm:px-8 sm:py-8">
-        <div className="max-w-xl">
-          <p className="eyebrow mb-3">{fmtDate(now)}</p>
-          <h1 className="text-4xl leading-tight sm:text-5xl">{greeting(now)}.</h1>
-          <p className="mt-3 text-base leading-7 text-muted">Reserve um momento de silêncio para estar com a Palavra.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            {lastBook && last.data ? (
-              <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="btn-primary"><BookOpen className="h-4 w-4" aria-hidden /> Continuar {lastBook.name} {last.data.chapter}</Link>
-            ) : <Link to="/biblia" className="btn-primary"><BookOpen className="h-4 w-4" aria-hidden /> Começar a leitura</Link>}
-            <Link to="/caminhada" className="btn-outline"><Footprints className="h-4 w-4" aria-hidden /> Minha caminhada</Link>
-          </div>
+    <div className="space-y-12 sm:space-y-14">
+      <header className="fade-up flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+        <div>
+          <p className="eyebrow mb-2">{fmtDate(now)}</p>
+          <h1 className="text-4xl leading-tight sm:text-[2.8rem]">{greeting(now)}.</h1>
         </div>
+        <Link to="/caminhada" className="mb-1 inline-flex items-center gap-2 text-sm text-muted underline-offset-4 hover:text-olive hover:underline"><Footprints className="h-4 w-4" aria-hidden /> Minha caminhada</Link>
       </header>
 
+      <section aria-labelledby="continue-reading">
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 id="continue-reading" className="eyebrow">Sua leitura</h2>
+          <Link to="/biblia" className="text-xs text-muted underline-offset-4 hover:text-olive hover:underline">Biblioteca</Link>
+        </div>
+        <Link to={lastBook && last.data ? `/biblia/${bookSlug(lastBook)}/${last.data.chapter}` : '/biblia'} className="group flex items-center justify-between gap-4 border-y border-olive/30 py-4 transition-colors hover:border-olive sm:py-5">
+          <div className="min-w-0">
+            <p className="text-xs text-muted">{lastBook && last.data ? 'Retome de onde parou' : 'Comece uma leitura'}</p>
+            <h2 className="mt-1 truncate font-serif text-2xl sm:text-[1.8rem]">{lastBook && last.data ? `${lastBook.name} ${last.data.chapter}` : 'Explore as Escrituras'}</h2>
+          </div>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-olive text-on-olive transition-transform group-hover:translate-x-1"><ArrowRight className="h-5 w-5" aria-hidden /></span>
+        </Link>
+      </section>
+
       <section aria-labelledby="pd">
-        <h2 id="pd" className="eyebrow mb-3">Palavra do dia</h2>
+        <div className="mb-3">
+          <p className="eyebrow">Para meditar</p>
+          <h2 id="pd" className="mt-1 font-serif text-2xl sm:text-3xl">Palavra do dia</h2>
+        </div>
         <WordOfTheDay />
         <TestNotice className="mt-3" />
       </section>
 
-      <section aria-labelledby="temas">
-        <h2 id="temas" className="mb-4 text-2xl sm:text-3xl">Temas</h2>
+      <section aria-labelledby="temas" className="border-t border-line pt-7">
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 id="temas" className="font-serif text-2xl sm:text-3xl">Explore por tema</h2>
+          <Link to="/explorar" className="text-xs text-muted underline-offset-4 hover:text-olive hover:underline">Ver tudo</Link>
+        </div>
         <div className="flex flex-wrap gap-2">
           {themes.data?.map((t) => <Link key={t.id} to={`/explorar?tema=${t.slug}`} className="chip">{t.name}</Link>)}
         </div>
       </section>
 
-      <section aria-label="Acessos rápidos" className="grid gap-3 sm:grid-cols-2">
+      <section aria-label="Acessos rápidos" className="grid gap-x-8 sm:grid-cols-2">
         {[
           { to: '/favoritos', icon: Heart, label: 'Meus favoritos' },
           { to: '/favoritos?aba=recentes', icon: Clock, label: 'Vistos recentemente' },
@@ -99,8 +113,8 @@ export default function Home() {
           { to: '/catolica/terco', icon: Landmark, label: 'Rezar o terço' },
           { to: '/catolica/oracoes', icon: ScrollText, label: 'Orações' },
         ].map(({ to, icon: Icon, label }) => (
-          <Link key={to} to={to} className="surface group flex items-center gap-3 p-5 transition-colors hover:border-gold">
-            <Icon className="h-5 w-5 text-gold" aria-hidden /> <span className="flex-1">{label}</span><span className="text-muted transition-transform group-hover:translate-x-1" aria-hidden>→</span>
+          <Link key={to} to={to} className="group flex min-h-12 items-center gap-3 border-b border-line py-3 text-sm transition-colors hover:text-olive">
+            <Icon className="h-4 w-4 text-gold" aria-hidden /> <span className="flex-1">{label}</span><ArrowRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-1" aria-hidden />
           </Link>
         ))}
       </section>

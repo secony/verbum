@@ -106,17 +106,17 @@ export default function Chapter() {
 
   return (
     <div>
-      <div className="sticky top-12 z-10 -mx-4 mb-6 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-10 md:px-10">
+      <div className="sticky top-[3.25rem] z-10 -mx-4 mb-6 border-b border-line/80 bg-bg/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-10 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link to="/biblia" className="eyebrow hover:underline">{book.testament === 'AT' ? 'Antigo Testamento' : 'Novo Testamento'}</Link>
-            <h1 className="text-3xl md:text-4xl">{book.name} {chapter}</h1>
+            <h1 className="font-serif text-[1.7rem] leading-tight sm:text-3xl">{book.name} <span className="text-muted">{chapter}</span></h1>
           </div>
           <div className="flex items-center gap-2">
-            <div role="group" aria-label="Modo de leitura" className="flex rounded-xl border border-line bg-soft p-0.5 text-sm">
+            <div role="group" aria-label="Modo de leitura" className="flex border-b border-line text-xs sm:text-sm">
               {([['verses', 'Versículos'], ['continuous', 'Contínuo']] as const).map(([id, label]) => (
                 <button key={id} onClick={() => prefs.setMode(id)} aria-pressed={mode === id}
-                  className={cn('rounded-lg px-3 py-1.5', mode === id ? 'bg-surface shadow-soft font-medium' : 'text-muted')}>{label}</button>
+                  className={cn('px-2 py-2 sm:px-3', mode === id ? 'border-b-2 border-olive font-medium text-olive' : 'text-muted')}>{label}</button>
               ))}
             </div>
             <button className="icon-btn" aria-label="Diminuir fonte" disabled={fi <= 0} onClick={() => { const s = FONTS[fi - 1]; if (s) prefs.setFont(s); }}><Minus className="h-4 w-4" /></button>
@@ -130,17 +130,17 @@ export default function Chapter() {
       {verses.isLoading ? <Spinner /> : verses.isError ? <ErrorBox onRetry={() => verses.refetch()} /> : !verses.data?.length ? (
         <EmptyState title="Texto bíblico ainda não importado">Este capítulo ainda não tem texto na base. Quando a fonte estiver configurada, ele aparecerá aqui.</EmptyState>
       ) : mode === 'verses' ? (
-        <ol className="space-y-1">
+        <ol className="mx-auto max-w-[70ch] space-y-1.5">
           {verses.data.map((v) => (
-            <li key={v.id} id={`v${v.verse}`} className="group flex gap-3 rounded-xl px-2 py-2 hover:bg-soft/70">
-              <span className="w-7 shrink-0 pt-1.5 text-right text-xs font-semibold text-gold" aria-label={`Versículo ${v.verse}`}>{v.verse}</span>
-              <p className="verse-text flex-1">{v.text}</p>
-              <VerseActions verse={v} dialogs={dialogs} className="shrink-0 self-start opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100" />
+            <li key={v.id} id={`v${v.verse}`} className="group flex flex-wrap items-start gap-x-3 rounded-md px-1.5 py-2 transition-colors hover:bg-soft/45 sm:px-2 sm:py-2.5">
+              <span className="w-6 shrink-0 pt-1.5 text-right font-sans text-[0.68rem] font-semibold tabular-nums text-gold" aria-label={`Versículo ${v.verse}`}>{v.verse}</span>
+              <p className="verse-text min-w-0 flex-1">{v.text}</p>
+              <VerseActions verse={v} dialogs={dialogs} className="basis-full justify-start pl-9 sm:basis-auto sm:pl-0 sm:opacity-0 sm:transition-opacity group-hover:sm:opacity-100 group-focus-within:sm:opacity-100" />
             </li>
           ))}
         </ol>
       ) : (
-        <div className="verse-text !leading-[1.95] max-w-[65ch]">
+        <div className="verse-text mx-auto max-w-[65ch] !leading-[1.9]">
           {verses.data.map((v) => {
             const isSel = v.id === selected;
             return (

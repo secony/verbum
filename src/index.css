@@ -4,14 +4,14 @@
 
 :root {
   color-scheme: light;
-  --bg: 247 245 239;
-  --surface: 255 255 255;
-  --soft: 241 238 228;
-  --line: 226 222 211;
-  --fg: 40 40 32;
-  --muted: 105 104 94;
-  --gold: 155 116 48;
-  --olive: 82 96 61;
+  --bg: 243 239 229;
+  --surface: 255 252 245;
+  --soft: 235 231 218;
+  --line: 219 214 200;
+  --fg: 41 45 40;
+  --muted: 105 105 96;
+  --gold: 158 121 60;
+  --olive: 38 61 51;
   --on-olive: 255 255 255;
   --danger: 160 60 50;
   --verse-size: 1.375rem;
@@ -21,15 +21,15 @@
 }
 .dark {
   color-scheme: dark;
-  --bg: 18 19 16;
-  --surface: 27 29 24;
-  --soft: 37 39 32;
-  --line: 57 59 49;
-  --fg: 235 232 222;
-  --muted: 174 172 159;
-  --gold: 207 171 99;
-  --olive: 154 166 120;
-  --on-olive: 20 22 17;
+  --bg: 22 27 24;
+  --surface: 31 38 33;
+  --soft: 42 51 44;
+  --line: 61 70 62;
+  --fg: 237 235 225;
+  --muted: 177 180 165;
+  --gold: 202 169 111;
+  --olive: 143 164 137;
+  --on-olive: 24 32 27;
   --danger: 214 120 108;
   --shadow-surface: 0 1px 2px rgb(0 0 0 / 0.18), 0 14px 34px -24px rgb(0 0 0 / 0.58);
 }

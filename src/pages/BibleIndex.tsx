@@ -10,15 +10,15 @@ import { TestNotice } from '../components/TestNotice';
 
 function BookRow({ book, open, onToggle }: { book: Book; open: boolean; onToggle: () => void }) {
   return (
-    <li className="border-b border-line last:border-0">
-      <button onClick={onToggle} aria-expanded={open} className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-soft">
-        <span><span className="font-serif text-xl">{book.name}</span> <span className="text-xs text-muted">· {book.chapters_count} cap.</span></span>
-        <ChevronRight className={cn('h-4 w-4 text-muted transition-transform', open && 'rotate-90')} aria-hidden />
+    <li className={cn('border-b border-line/70 pb-2', open && 'border-olive/50')}>
+      <button onClick={onToggle} aria-expanded={open} className="flex min-h-12 w-full items-center justify-between gap-2 py-2 text-left hover:text-olive">
+        <span><span className="font-serif text-[1.2rem]">{book.name}</span> <span className="ml-1 text-xs text-muted">{book.chapters_count} caps.</span></span>
+        <ChevronRight className={cn('h-4 w-4 text-muted transition-transform', open && 'rotate-90 text-olive')} aria-hidden />
       </button>
       {open && (
-        <div className="grid grid-cols-6 gap-1.5 px-4 pb-4 sm:grid-cols-8 md:grid-cols-10">
+        <div className="grid grid-cols-6 gap-2 pb-3 pt-1 sm:grid-cols-8 md:grid-cols-6 xl:grid-cols-8">
           {Array.from({ length: book.chapters_count }, (_, i) => i + 1).map((c) => (
-            <Link key={c} to={`/biblia/${bookSlug(book)}/${c}`} className="rounded-lg border border-line py-1.5 text-center text-sm hover:border-olive hover:bg-soft">{c}</Link>
+            <Link key={c} to={`/biblia/${bookSlug(book)}/${c}`} className="flex min-h-10 items-center justify-center rounded-md bg-soft/70 text-sm tabular-nums transition-colors hover:bg-olive hover:text-on-olive">{c}</Link>
           ))}
         </div>
       )}
@@ -41,24 +41,27 @@ export default function BibleIndex() {
   ];
   return (
     <div>
-      <PageHeader eyebrow="Cânon católico · 73 livros" title="Bíblia">Escolha um livro e um capítulo para ler.</PageHeader>
-      <TestNotice className="mb-6" />
-      <label className="relative mb-6 block max-w-xl">
+      <PageHeader eyebrow="A biblioteca" title="Bíblia">Encontre um livro ou retome sua leitura. Selecione um livro para ver os capítulos.</PageHeader>
+      <TestNotice className="mb-6 max-w-2xl" />
+      <label className="relative mb-8 block max-w-xl">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
         <span className="sr-only">Buscar livro bíblico</span>
-        <input type="search" className="input pl-10" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar livro da Bíblia" />
+        <input type="search" className="input pl-10" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Ex.: Gênesis, João, Salmos" />
       </label>
       {lastBook && last.data && (
-        <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="surface mb-8 flex items-center justify-between p-5 hover:border-gold">
-          <span><span className="eyebrow block">Continuar leitura</span><span className="font-serif text-2xl">{lastBook.name} {last.data.chapter}</span></span>
-          <ChevronRight className="h-5 w-5 text-gold" aria-hidden />
+        <Link to={`/biblia/${bookSlug(lastBook)}/${last.data.chapter}`} className="mb-10 flex items-center justify-between border-y border-olive/30 py-4 transition-colors hover:border-olive">
+          <span><span className="eyebrow block">Retomar de onde parou</span><span className="font-serif text-2xl">{lastBook.name} {last.data.chapter}</span></span>
+          <ChevronRight className="h-5 w-5 text-olive" aria-hidden />
         </Link>
       )}
-      {groups.every((group) => !group.items.length) ? <p className="py-8 text-sm text-muted">Nenhum livro encontrado para essa busca.</p> : <div className="grid gap-8 lg:grid-cols-2">
+      {groups.every((group) => !group.items.length) ? <p className="py-8 text-sm text-muted">Nenhum livro encontrado para essa busca.</p> : <div className="grid gap-x-12 gap-y-10 lg:grid-cols-2">
         {groups.filter((g) => g.items.length > 0).map((g) => (
           <section key={g.id} aria-labelledby={`g-${g.id}`}>
-            <h2 id={`g-${g.id}`} className="mb-3 text-3xl">{g.title}</h2>
-            <ul className="surface overflow-hidden">
+            <div className="mb-4 flex items-baseline justify-between border-b border-line pb-2">
+              <h2 id={`g-${g.id}`} className="text-2xl">{g.title}</h2>
+              <span className="text-xs text-muted">{g.items.length} livros</span>
+            </div>
+            <ul className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {g.items.map((b) => <BookRow key={b.id} book={b} open={open === b.id} onToggle={() => setOpen(open === b.id ? null : b.id)} />)}
             </ul>
           </section>
