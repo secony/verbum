@@ -7,21 +7,15 @@ import { useBooks, useLastPosition, type Book } from '../lib/data';
 import { cn } from '../lib/utils';
 import { ErrorBox, PageHeader, Spinner } from '../components/ui';
 import { TestNotice } from '../components/TestNotice';
+import { ChapterPicker } from '../components/ChapterPicker';
 
-function BookRow({ book, open, onToggle }: { book: Book; open: boolean; onToggle: () => void }) {
+function BookRow({ book, onOpen }: { book: Book; onOpen: () => void }) {
   return (
-    <li className={cn('border-b border-line/70 pb-2', open && 'border-olive/50')}>
-      <button onClick={onToggle} aria-expanded={open} className="flex min-h-12 w-full items-center justify-between gap-2 py-2 text-left hover:text-olive">
-        <span><span className="font-serif text-[1.2rem]">{book.name}</span> <span className="ml-1 text-xs text-muted">{book.chapters_count} caps.</span></span>
-        <ChevronRight className={cn('h-4 w-4 text-muted transition-transform', open && 'rotate-90 text-olive')} aria-hidden />
+    <li className="border-b border-line/70">
+      <button onClick={onOpen} aria-haspopup="dialog" className="group flex min-h-12 w-full items-center justify-between gap-2 py-2 text-left hover:text-olive">
+        <span className="min-w-0"><span className="font-serif text-[1.2rem]">{book.name}</span> <span className="ml-1 whitespace-nowrap text-xs text-muted">{book.chapters_count} caps.</span></span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-olive" aria-hidden />
       </button>
-      {open && (
-        <div className="grid grid-cols-6 gap-2 pb-3 pt-1 sm:grid-cols-8 md:grid-cols-6 xl:grid-cols-8">
-          {Array.from({ length: book.chapters_count }, (_, i) => i + 1).map((c) => (
-            <Link key={c} to={`/biblia/${bookSlug(book)}/${c}`} className="flex min-h-10 items-center justify-center rounded-md bg-soft/70 text-sm tabular-nums transition-colors hover:bg-olive hover:text-on-olive">{c}</Link>
-          ))}
-        </div>
-      )}
     </li>
   );
 }
@@ -29,7 +23,7 @@ function BookRow({ book, open, onToggle }: { book: Book; open: boolean; onToggle
 export default function BibleIndex() {
   const books = useBooks();
   const last = useLastPosition();
-  const [open, setOpen] = useState<number | null>(null);
+  const [picker, setPicker] = useState<number | null>(null);
   const [query, setQuery] = useState('');
   if (books.isLoading) return <Spinner />;
   if (books.isError || !books.data) return <ErrorBox onRetry={() => books.refetch()} />;
@@ -62,11 +56,12 @@ export default function BibleIndex() {
               <span className="text-xs text-muted">{g.items.length} livros</span>
             </div>
             <ul className="grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {g.items.map((b) => <BookRow key={b.id} book={b} open={open === b.id} onToggle={() => setOpen(open === b.id ? null : b.id)} />)}
+              {g.items.map((b) => <BookRow key={b.id} book={b} onOpen={() => setPicker(b.id)} />)}
             </ul>
           </section>
         ))}
       </div>}
+      <ChapterPicker open={picker !== null} books={books.data} initialBookId={picker ?? books.data[0]!.id} onClose={() => setPicker(null)} />
     </div>
   );
 }

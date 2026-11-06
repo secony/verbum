@@ -1,10 +1,12 @@
-import json, re, subprocess, time, sys, base64
+import json, re, subprocess, time, sys, base64, os
+HERE = os.path.dirname(os.path.abspath(__file__))
+SHOTS = os.path.join(HERE, 'shots'); os.makedirs(SHOTS, exist_ok=True)
 from urllib.parse import urlparse, parse_qs
 from playwright.sync_api import sync_playwright
 
 # --- dados de teste (versículos reais do banco) ---
-V = json.load(open('/home/claude/verbum/e2e/verses.json'))
-BOOKS = json.load(open('/home/claude/verbum/e2e/books.json'))
+V = json.load(open(os.path.join(HERE, 'verses.json')))
+BOOKS = json.load(open(os.path.join(HERE, 'books.json')))
 BYID = {b['id']: b for b in BOOKS}
 def emb(v): 
     b = BYID[v['book_id']]
@@ -122,7 +124,7 @@ with sync_playwright() as p:
         pg = ctx.new_page(); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'Failed to load resource' not in m.text and 'fonts' not in m.text else None)
         return pg, errs
-    S = lambda name: f'/home/claude/shots/{name}.png'
+    S = lambda name: os.path.join(SHOTS, f'{name}.png')
 
     # ---------- deslogado, desktop claro ----------
     pg, errs = page_for(1280, 900)
@@ -131,7 +133,7 @@ with sync_playwright() as p:
     check('home: aviso de teste visível', pg.locator('text=Texto de teste em inglês').count() >= 1)
     pg.screenshot(path=S('home_desktop_light'), full_page=True)
     pg.goto(BASE + '/biblia'); pg.wait_for_selector('text=Antigo Testamento'); 
-    check('bíblia: 73 livros listados', pg.locator('ul.surface li').count() == 73)
+    check('bíblia: 73 livros listados', pg.locator('section li').count() == 73)
     pg.get_by_role('button', name=re.compile('^João')).click(); pg.wait_for_timeout(200)
     check('bíblia: João abre 21 capítulos', pg.locator('a[href^="/biblia/joao/"]').count() == 21)
     pg.screenshot(path=S('biblia_desktop'))
@@ -342,6 +344,33 @@ with sync_playwright() as p:
     for _ in range(12): ptm.get_by_role('button', name='Próxima conta').click()
     check('terço (celular): sem rolagem lateral', ptm.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
     ptm.screenshot(path=S('terco_mobile_dark'))
+    bar = ptm.locator('div.sticky.bottom-20').bounding_box(); h1b = ptm.locator('h1').bounding_box(); txt = ptm.locator('p.verse-text').bounding_box()
+    check('terço (celular): título e início do texto da oração visíveis acima dos botões', h1b['y'] + h1b['height'] < bar['y'] and txt['y'] + 60 < bar['y'], f"h1={h1b['y']:.0f} texto={txt['y']:.0f} barra={bar['y']:.0f}")
+
+    # ---------- melhorias de interface: seletor de capítulo, navegação, esqueletos ----------
+    pu, erru = page_for(1280, 900)
+    pu.goto(BASE + '/biblia/genesis/1'); pu.wait_for_selector('h1')
+    check('leitor: sem "anterior" no primeiro capítulo da Bíblia', pu.get_by_role('link', name='Capítulo anterior').count() == 0 and pu.get_by_role('link', name='Próximo capítulo').count() == 1)
+    pu.get_by_role('button', name=re.compile('Escolher outro livro ou capítulo')).click(); pu.wait_for_selector('dialog[open] #pick-livro')
+    check('seletor: abre com o livro atual (50 capítulos de Gênesis)', pu.locator('dialog[open] a[href^="/biblia/genesis/"]').count() == 50 and pu.locator('dialog[open] a[aria-current=page]').count() == 1)
+    pu.locator('#pick-livro').select_option(label='João'); pu.wait_for_timeout(150)
+    check('seletor: trocar o livro mostra os 21 capítulos de João', pu.locator('dialog[open] a[href^="/biblia/joao/"]').count() == 21)
+    pu.screenshot(path=S('seletor_capitulo'))
+    pu.locator('dialog[open] a[href="/biblia/joao/3"]').click(); pu.wait_for_url('**/biblia/joao/3'); pu.wait_for_timeout(300)
+    check('seletor: escolher o capítulo navega e fecha o diálogo', pu.locator('dialog[open]').count() == 0 and 'João' in pu.locator('h1').inner_text())
+    pu.get_by_role('link', name='Capítulo anterior').click(); pu.wait_for_url('**/biblia/joao/2')
+    check('leitor: seta do cabeçalho vai para o capítulo anterior', True)
+    pu.keyboard.press('ArrowRight'); pu.wait_for_url('**/biblia/joao/3'); pu.keyboard.press('ArrowRight'); pu.wait_for_url('**/biblia/joao/4')
+    check('leitor: teclas ← → trocam de capítulo', True)
+    pu.goto(BASE + '/biblia'); pu.wait_for_selector('section li')
+    pu.get_by_role('button', name=re.compile('^Salmos')).click(); pu.wait_for_selector('dialog[open] #pick-livro')
+    check('índice: clicar no livro abre o seletor com 150 capítulos de Salmos (sem esticar a grade)', pu.locator('dialog[open] a[href^="/biblia/salmos/"]').count() == 150)
+    check('seletor: sem erros de console', not erru, str(erru)[:300])
+    pum, errum = page_for(390, 844, dark=True)
+    pum.goto(BASE + '/biblia'); pum.wait_for_selector('section li'); pum.get_by_role('button', name=re.compile('^Lucas')).click(); pum.wait_for_selector('dialog[open] #pick-livro'); pum.wait_for_timeout(300)
+    box = pum.locator('dialog[open]').bounding_box()
+    check('seletor (celular): abre como folha colada na parte de baixo', box is not None and abs((box['y'] + box['height']) - 844) < 2 and box['width'] >= 388, str(box))
+    pum.screenshot(path=S('seletor_mobile'))
     br.close()
 
 bad = [r for r in results if not r[1]]

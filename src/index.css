@@ -16,8 +16,8 @@
   --danger: 160 60 50;
   --verse-size: 1.375rem;
   --radius-control: 0.7rem;
-  --radius-surface: 1rem;
-  --shadow-surface: 0 1px 2px rgb(34 31 22 / 0.035), 0 12px 30px -22px rgb(34 31 22 / 0.2);
+  --radius-surface: 0.75rem;
+  --shadow-surface: 0 1px 0 rgb(34 31 22 / 0.04);
 }
 .dark {
   color-scheme: dark;
@@ -31,7 +31,7 @@
   --olive: 143 164 137;
   --on-olive: 24 32 27;
   --danger: 214 120 108;
-  --shadow-surface: 0 1px 2px rgb(0 0 0 / 0.18), 0 14px 34px -24px rgb(0 0 0 / 0.58);
+  --shadow-surface: 0 1px 0 rgb(0 0 0 / 0.25);
 }
 html[data-font='sm'] { --verse-size: 1.15rem; }
 html[data-font='md'] { --verse-size: 1.375rem; }
@@ -79,3 +79,7 @@ dialog[open] { animation: dialog-in 160ms ease-out both; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+@keyframes pop { 0% { transform: scale(0.7); } 55% { transform: scale(1.28); } 100% { transform: scale(1); } }
+@keyframes shimmer { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+.skeleton { background: linear-gradient(100deg, rgb(var(--soft)) 30%, rgb(var(--line) / 0.6) 50%, rgb(var(--soft)) 70%); background-size: 220% 100%; animation: shimmer 1.4s ease-in-out infinite; }

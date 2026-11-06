@@ -27,7 +27,7 @@ export function VerseActions({ verse, dialogs, className }: { verse: Verse; dial
   return (
     <div className={cn('verse-actions flex items-center gap-0.5', className)} role="group" aria-label="Ações do versículo">
       <button className="icon-btn" onClick={needLogin(() => toggle.mutate({ verseId: verse.id, on: !isFav }))} aria-pressed={isFav} aria-label={isFav ? 'Remover dos favoritos' : 'Favoritar'}>
-        <Heart className={cn('h-4 w-4', isFav && 'fill-gold text-gold')} />
+        <Heart className={cn('h-4 w-4', isFav && 'fill-gold text-gold animate-[pop_0.32s_ease-out]')} />
       </button>
       <button className="icon-btn" onClick={needLogin(() => dialogs.openNote(verse))} aria-label={hasNote ? 'Ver ou editar nota' : 'Adicionar nota'}>
         <StickyNote className={cn('h-4 w-4', hasNote && 'text-gold')} />

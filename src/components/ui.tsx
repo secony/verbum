@@ -92,3 +92,28 @@ export function Tabs<T extends string>({ value, onChange, items }: { value: T; o
     </div>
   );
 }
+
+export function Skeleton({ className }: { className?: string }) {
+  return <div aria-hidden className={cn('skeleton rounded-md', className)} />;
+}
+
+/** Esqueleto de texto corrido: mostra a forma da página enquanto os versículos chegam. */
+export function VersesSkeleton({ lines = 9 }: { lines?: number }) {
+  return (
+    <div role="status" aria-label="Carregando o texto" className="mx-auto max-w-[65ch] space-y-3.5 py-2">
+      {Array.from({ length: lines }, (_, i) => <Skeleton key={i} className={cn('h-5', i % 4 === 3 ? 'w-2/3' : 'w-full')} />)}
+      <span className="sr-only">Carregando…</span>
+    </div>
+  );
+}
+
+export function CardsSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div role="status" aria-label="Carregando resultados" className="space-y-3">
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className="surface space-y-3 p-5"><Skeleton className="h-6 w-11/12" /><Skeleton className="h-6 w-3/5" /><Skeleton className="mt-4 h-4 w-24" /></div>
+      ))}
+      <span className="sr-only">Carregando…</span>
+    </div>
+  );
+}

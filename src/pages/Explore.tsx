@@ -7,7 +7,7 @@ import { parseReference } from '../lib/reference';
 import { bookSlug } from '../lib/bible-nav';
 import { VERSE_SELECT, useBooks, useThemes, type Verse } from '../lib/data';
 import { cn } from '../lib/utils';
-import { EmptyState, ErrorBox, PageHeader, Spinner } from '../components/ui';
+import { CardsSkeleton, EmptyState, ErrorBox, PageHeader } from '../components/ui';
 import { VerseCard } from '../components/VerseCard';
 import { useVerseDialogs } from '../components/VerseDialogs';
 import { TestNotice } from '../components/TestNotice';
@@ -111,7 +111,7 @@ export default function Explore() {
         <Link to={`/biblia/${bookSlug(refBook)}/${ref.chapter}`} className="mb-4 inline-block text-sm text-olive hover:underline">Abrir {refBook.name} {ref.chapter} no leitor →</Link>
       )}
 
-      {results.isLoading ? <Spinner /> : results.isError ? <ErrorBox onRetry={() => results.refetch()} /> : rows.length === 0 ? (
+      {results.isLoading ? <CardsSkeleton count={4} /> : results.isError ? <ErrorBox onRetry={() => results.refetch()} /> : rows.length === 0 ? (
         themeSlug ? (
           <EmptyState icon={<SearchX className="h-8 w-8" />} title="Este tema ainda não tem versículos">As associações entre temas e versículos ainda não foram cadastradas. Elas serão feitas com critério editorial, sem inventar classificações.</EmptyState>
         ) : (

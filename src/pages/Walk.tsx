@@ -76,13 +76,13 @@ export default function Walk() {
       {header}
       {shouldWelcomeBack(w) && <p role="status" className="border-l-2 border-gold pl-4 text-muted">Que bom ter você aqui. Sua caminhada pode recomeçar com calma, no seu ritmo.</p>}
 
-      <section aria-label="Resumo" className="grid grid-cols-3 gap-3">
+      <section aria-label="Resumo" className="surface grid grid-cols-3 divide-x divide-line">
         {[
           { icon: Flame, v: w.streak.current_streak, l: 'dias seguidos' },
           { icon: Footprints, v: w.streak.total_days, l: 'dias de prática' },
           { icon: Flame, v: w.streak.longest_streak, l: 'maior sequência' },
         ].map(({ icon: Icon, v, l }) => (
-          <div key={l} className="surface p-4 text-center">
+          <div key={l} className="p-4 text-center">
             <Icon className="mx-auto mb-1 h-4 w-4 text-gold" aria-hidden />
             <p className="font-serif text-4xl">{v}</p><p className="text-xs text-muted">{l}</p>
           </div>
@@ -114,10 +114,11 @@ export default function Walk() {
         <div className="grid grid-cols-7 gap-1">
           {week.map((d) => {
             const on = w.days.includes(d);
+            const isToday = d === w.today;
             return (
               <div key={d} className="flex flex-col items-center gap-2 text-xs">
-                <span className="text-muted">{new Date(`${d}T12:00:00Z`).toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' })}</span>
-                <span className={cn('flex h-9 w-9 items-center justify-center rounded-full', on ? 'bg-olive text-on-olive' : 'bg-soft text-muted')} aria-label={`${d}: ${on ? 'praticado' : 'sem registro'}`}>
+                <span className={isToday ? 'font-semibold text-gold' : 'text-muted'}>{isToday ? 'hoje' : new Date(`${d}T12:00:00Z`).toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' })}</span>
+                <span className={cn('flex h-9 w-9 items-center justify-center rounded-full', on ? 'bg-olive text-on-olive' : 'bg-soft text-muted', isToday && 'ring-2 ring-gold ring-offset-2 ring-offset-bg')} aria-label={`${d}: ${on ? 'praticado' : 'sem registro'}`}>
                   {on ? <Check className="h-4 w-4" /> : d.slice(-2)}
                 </span>
               </div>

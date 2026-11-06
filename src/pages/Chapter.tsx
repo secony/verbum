@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Minus, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { usePrefs, FONTS } from '../lib/prefs';
@@ -10,7 +10,8 @@ import { adjacentChapter, bookSlug } from '../lib/bible-nav';
 import { resolveMode } from '../lib/reading-mode';
 import { savePosition, useBooks, useFavoriteIds, useNoteVerseIds, VERSE_SELECT, type Verse } from '../lib/data';
 import { cn } from '../lib/utils';
-import { EmptyState, ErrorBox, Spinner } from '../components/ui';
+import { EmptyState, ErrorBox, Spinner, VersesSkeleton } from '../components/ui';
+import { ChapterPicker } from '../components/ChapterPicker';
 import { TestNotice } from '../components/TestNotice';
 import { VerseActions } from '../components/VerseActions';
 import { useVerseDialogs } from '../components/VerseDialogs';
@@ -62,6 +63,8 @@ export default function Chapter() {
   const notes = useNoteVerseIds();
   const { dialogs, element } = useVerseDialogs();
   const [selected, setSelected] = useState<number | null>(null);
+  const [picker, setPicker] = useState(false);
+  const navigate = useNavigate();
 
   const book = books.data?.find((b) => bookSlug(b) === livro);
   const chapter = Number(capitulo);
@@ -85,6 +88,21 @@ export default function Chapter() {
 
   const prev = useMemo(() => (book ? adjacentChapter(books.data!, { bookId: book.id, chapter }, -1) : null), [books.data, book, chapter]);
   const next = useMemo(() => (book ? adjacentChapter(books.data!, { bookId: book.id, chapter }, 1) : null), [books.data, book, chapter]);
+  useEffect(() => {
+    // Atalhos de teclado no computador: ← capítulo anterior, → próximo
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      if (document.querySelector('dialog[open]')) return;
+      const p = e.key === 'ArrowLeft' ? prev : e.key === 'ArrowRight' ? next : null;
+      const b = p ? books.data?.find((x) => x.id === p.bookId) : undefined;
+      if (p && b) navigate(`/biblia/${bookSlug(b)}/${p.chapter}`);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [prev, next, books.data, navigate]);
+
   const href = (p: { bookId: number; chapter: number }) => `/biblia/${bookSlug(books.data!.find((b) => b.id === p.bookId)!)}/${p.chapter}`;
 
   if (books.isLoading) return <Spinner />;
@@ -108,9 +126,17 @@ export default function Chapter() {
     <div>
       <div className="sticky top-[3.25rem] z-10 -mx-4 mb-6 border-b border-line/80 bg-bg/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-10 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link to="/biblia" className="eyebrow hover:underline">{book.testament === 'AT' ? 'Antigo Testamento' : 'Novo Testamento'}</Link>
-            <h1 className="font-serif text-[1.7rem] leading-tight sm:text-3xl">{book.name} <span className="text-muted">{chapter}</span></h1>
+          <div className="flex items-center gap-1">
+            {prev ? <Link to={href(prev)} className="icon-btn -ml-2" aria-label="Capítulo anterior"><ChevronLeft className="h-5 w-5" /></Link> : <span className="-ml-2 h-10 w-10" aria-hidden />}
+            <div className="min-w-0">
+              <Link to="/biblia" className="eyebrow hover:underline">{book.testament === 'AT' ? 'Antigo Testamento' : 'Novo Testamento'}</Link>
+              <h1 className="font-serif text-[1.7rem] leading-tight sm:text-3xl">
+                <button onClick={() => setPicker(true)} aria-haspopup="dialog" aria-label={`${book.name} ${chapter}. Escolher outro livro ou capítulo`} className="inline-flex items-center gap-1.5 text-left transition-colors hover:text-olive">
+                  <span>{book.name} <span className="text-muted">{chapter}</span></span><ChevronDown className="h-4 w-4 text-muted" aria-hidden />
+                </button>
+              </h1>
+            </div>
+            {next ? <Link to={href(next)} className="icon-btn" aria-label="Próximo capítulo"><ChevronRight className="h-5 w-5" /></Link> : <span className="h-10 w-10" aria-hidden />}
           </div>
           <div className="flex items-center gap-2">
             <div role="group" aria-label="Modo de leitura" className="flex border-b border-line text-xs sm:text-sm">
@@ -127,7 +153,7 @@ export default function Chapter() {
 
       <TestNotice className="mb-6" />
 
-      {verses.isLoading ? <Spinner /> : verses.isError ? <ErrorBox onRetry={() => verses.refetch()} /> : !verses.data?.length ? (
+      {verses.isLoading ? <VersesSkeleton /> : verses.isError ? <ErrorBox onRetry={() => verses.refetch()} /> : !verses.data?.length ? (
         <EmptyState title="Texto bíblico ainda não importado">Este capítulo ainda não tem texto na base. Quando a fonte estiver configurada, ele aparecerá aqui.</EmptyState>
       ) : mode === 'verses' ? (
         <ol className="mx-auto max-w-[70ch] space-y-1.5">
@@ -169,6 +195,7 @@ export default function Chapter() {
         </div>
       )}
       {element}
+      <ChapterPicker open={picker} books={books.data!} initialBookId={book.id} current={{ bookId: book.id, chapter }} onClose={() => setPicker(false)} />
     </div>
   );
 }

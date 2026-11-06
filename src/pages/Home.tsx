@@ -9,7 +9,7 @@ import { bookSlug } from '../lib/bible-nav';
 import { VerseCard } from '../components/VerseCard';
 import { useVerseDialogs } from '../components/VerseDialogs';
 import { TestNotice } from '../components/TestNotice';
-import { EmptyState, ErrorBox, Spinner } from '../components/ui';
+import { EmptyState, ErrorBox, Skeleton } from '../components/ui';
 
 function WordOfTheDay() {
   const { dialogs, element } = useVerseDialogs();
@@ -32,7 +32,13 @@ function WordOfTheDay() {
     },
   });
 
-  if (count.isLoading || verse.isLoading) return <Spinner />;
+  if (count.isLoading || verse.isLoading) {
+    return (
+      <div role="status" aria-label="Carregando a Palavra do dia" className="space-y-4 border-y border-line bg-soft/40 px-5 py-8">
+        <Skeleton className="h-7 w-11/12" /><Skeleton className="h-7 w-3/5" /><Skeleton className="mt-5 h-4 w-28" /><span className="sr-only">Carregando…</span>
+      </div>
+    );
+  }
   if (count.isError || verse.isError) return <ErrorBox onRetry={() => { count.refetch(); verse.refetch(); }} />;
   if (idx == null || !verse.data) {
     return (

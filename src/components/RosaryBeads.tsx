@@ -22,7 +22,7 @@ function Piece({ b, state }: { b: Bead; state: BeadState }) {
 }
 
 /** Terço desenhado: cada conta muda de "vazia" para "preenchida" conforme a oração avança. */
-export function RosaryBeads({ current }: { current: number }) {
+export function RosaryBeads({ current, className }: { current: number; className?: string }) {
   const beads = useMemo(() => beadLayout(), []);
   const states = useMemo(() => beadStates(STEPS, current), [current]);
   const finished = current >= STEPS.length;
@@ -33,7 +33,7 @@ export function RosaryBeads({ current }: { current: number }) {
   const doneCount = Object.values(states).filter((s) => s === 'done').length;
 
   return (
-    <svg viewBox={`0 0 ${VIEW.w} ${VIEW.h}`} role="img" className="mx-auto h-auto w-full max-w-[22rem]"
+    <svg viewBox={`0 0 ${VIEW.w} ${VIEW.h}`} role="img" className={cn('mx-auto h-auto w-full max-w-[22rem]', className)}
       aria-label={`Terço: ${finished ? 'concluído' : `${label.line1}, ${label.line2}`}. ${doneCount} de ${beads.length} contas já rezadas.`}>
       {/* fios */}
       <circle cx={cx} cy={cy} r={r} className="fill-none stroke-line" strokeWidth={2} />
@@ -53,8 +53,8 @@ export function RosaryBeads({ current }: { current: number }) {
       )}
       {cur && cur.kind === 'cross' && <circle cx={cur.x} cy={cur.y} r={26} className="bead-ring fill-none stroke-gold" strokeWidth={2} aria-hidden />}
       {/* centro */}
-      <text x={cx} y={cy - 8} textAnchor="middle" className="fill-fg font-serif text-[22px]" aria-hidden>{label.line1}</text>
-      <text x={cx} y={cy + 18} textAnchor="middle" className="fill-muted text-[13px]" aria-hidden>{label.line2}</text>
+      <text x={cx} y={cy - 8} textAnchor="middle" className="fill-fg font-serif text-[22px] max-md:hidden" aria-hidden>{label.line1}</text>
+      <text x={cx} y={cy + 18} textAnchor="middle" className="fill-muted text-[13px] max-md:hidden" aria-hidden>{label.line2}</text>
     </svg>
   );
 }

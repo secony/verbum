@@ -104,21 +104,21 @@ function Pray({ set, start, onExit }: { set: MysterySet; start: number; onExit: 
       <div className="h-1 overflow-hidden rounded-full bg-soft" role="progressbar" aria-valuemin={0} aria-valuemax={STEPS.length} aria-valuenow={current} aria-label="Progresso do terço">
         <div className="h-full bg-olive transition-all duration-500" style={{ width: `${(current / STEPS.length) * 100}%` }} />
       </div>
-      <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,22rem)_1fr] md:items-start">
-        <div className="md:sticky md:top-8"><RosaryBeads current={current} /></div>
+      <div className="mt-3 grid gap-4 pb-24 md:mt-6 md:gap-8 md:pb-0 md:grid-cols-[minmax(0,22rem)_1fr] md:items-start">
+        <div className="md:sticky md:top-8"><RosaryBeads current={current} className="max-md:max-w-[10.5rem]" /></div>
         <section aria-live="polite" aria-label="Oração atual">
           <p className="eyebrow">{phaseLabel}</p>
           {mystery && (
-            <div className="surface mt-3 p-4">
+            <div className="surface mt-2 p-3 md:mt-3 md:p-4">
               <p className="font-serif text-2xl">{mystery.title}</p>
               {mystery.ref && book && <Link to={`/biblia/${bookSlug(book)}/${mystery.ref.chapter}`} className="mt-1 inline-flex items-center gap-1 text-sm text-olive hover:underline"><BookOpen className="h-3.5 w-3.5" aria-hidden /> Ler {mystery.ref.label}</Link>}
               {mystery.tradition && <p className="mt-1 text-xs text-muted">Mistério contemplado a partir da Tradição da Igreja.</p>}
               {step!.announce && <p className="mt-2 text-sm text-muted">Anuncie o mistério, medite por um instante e reze o Pai-Nosso.</p>}
             </div>
           )}
-          <h1 className="mt-5 text-3xl md:text-4xl">{prayer.title}{step!.ave ? <span className="ml-2 text-xl text-gold">{step!.ave} de {step!.aveTotal}</span> : null}</h1>
+          <h1 className="mt-3 text-2xl md:mt-5 md:text-4xl">{prayer.title}{step!.ave ? <span className="ml-2 text-xl text-gold">{step!.ave} de {step!.aveTotal}</span> : null}</h1>
           {step!.hint && <p className="mt-1 text-sm text-muted">{step!.hint}</p>}
-          {showText && <p className="verse-text mt-4 max-w-prose">{prayer.text}</p>}
+          {showText && <p className="verse-text mt-2 max-w-prose md:mt-4">{prayer.text}</p>}
           <button className="mt-3 text-xs text-muted underline" onClick={toggleText}>{showText ? 'Ocultar o texto da oração' : 'Mostrar o texto da oração'}</button>
         </section>
       </div>
